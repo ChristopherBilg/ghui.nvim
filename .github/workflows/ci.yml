@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: JohnnyMorganz/stylua-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check lua/ plugin/ tests/
+      - name: Install selene
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          URL=$(curl -s https://api.github.com/repos/Kampfkarren/selene/releases/latest | jq -r '.assets[] | select(.name | test("linux.zip$")) | .browser_download_url' | head -1)
+          curl -L "$URL" -o /tmp/selene.zip
+          unzip -o /tmp/selene.zip selene -d "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/selene"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Selene
+        run: selene lua/ plugin/
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+      - name: Install lua-language-server
+        run: |
+          TAG=$(curl -s https://api.github.com/repos/LuaLS/lua-language-server/releases/latest | jq -r .tag_name)
+          mkdir -p "$HOME/lua-ls"
+          curl -L "https://github.com/LuaLS/lua-language-server/releases/download/${TAG}/lua-language-server-${TAG}-linux-x64.tar.gz" \
+            | tar xz -C "$HOME/lua-ls"
+          echo "$HOME/lua-ls/bin" >> "$GITHUB_PATH"
+      - name: Typecheck
+        run: make typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        neovim: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim }}
+      - name: Run tests
+        run: nvim --headless --noplugin -u tests/minimal_init.lua -c "lua MiniTest.run()"

@@ -1,0 +1,97 @@
+*ghui.txt*               Run the ghui TUI in a floating window
+
+==============================================================================
+CONTENTS                                                        *ghui-contents*
+
+  1. Introduction ......................... |ghui-introduction|
+  2. Requirements ......................... |ghui-requirements|
+  3. Setup ................................ |ghui-setup|
+  4. Configuration ........................ |ghui-configuration|
+  5. Commands ............................. |ghui-commands|
+  6. API .................................. |ghui-api|
+  7. Health ............................... |ghui-health|
+
+==============================================================================
+1. INTRODUCTION                                             *ghui-introduction*
+
+ghui.nvim runs the `ghui` terminal UI (https://github.com/kitlangton/ghui), a
+keyboard-driven interface for GitHub pull requests, in a floating window inside
+Neovim, managed as a single reusable instance you toggle open and closed.
+Hiding the window keeps the process running, so your place in the TUI is
+preserved.
+
+It has no runtime dependencies.
+
+==============================================================================
+2. REQUIREMENTS                                             *ghui-requirements*
+
+- Neovim >= 0.11
+- The `ghui` executable in your PATH
+- The GitHub CLI `gh`, installed and authenticated (`gh auth login`)
+
+Run |:checkhealth| ghui to verify your setup.
+
+==============================================================================
+3. SETUP                                                           *ghui-setup*
+
+The plugin works with zero configuration; calling setup() is optional and only
+needed to override defaults: >lua
+
+    require("ghui").setup({
+      -- options, see |ghui-configuration|
+    })
+<
+==============================================================================
+4. CONFIGURATION                                           *ghui-configuration*
+
+Defaults: >lua
+
+    {
+      cmd = "ghui",             -- string|string[]: command to launch
+      args = {},                -- string[]: extra args
+      window = {
+        width = 0.9,            -- 0<n<=1 -> fraction of editor; n>1 -> columns
+        height = 0.9,           -- same semantics for rows
+        border = "rounded",     -- any nvim_open_win() border value
+        relative = "editor",
+        title = " ghui ",
+        title_pos = "center",
+        zindex = 50,
+        winblend = 0,
+      },
+      start_insert = true,      -- enter terminal-mode on open
+      keymaps = {
+        close = false,          -- buffer-local "hide" map, or false to disable
+      },
+      on_open = nil,            -- fun(term) called after the window opens
+      on_exit = nil,            -- fun(code) called when ghui exits
+    }
+<
+==============================================================================
+5. COMMANDS                                                     *ghui-commands*
+
+                                                                        *:Ghui*
+:Ghui            Toggle the ghui window.
+
+==============================================================================
+6. API                                                               *ghui-api*
+
+                                                                *ghui.setup()*
+require("ghui").setup({opts})   Apply configuration (optional).
+
+                                                                 *ghui.open()*
+require("ghui").open()          Open or reveal the window.
+
+                                                                *ghui.close()*
+require("ghui").close()         Hide the window (process keeps running).
+
+                                                               *ghui.toggle()*
+require("ghui").toggle()        Toggle the window.
+
+==============================================================================
+7. HEALTH                                                         *ghui-health*
+
+Run |:checkhealth| ghui to check the Neovim version, that `ghui` is installed
+and on your PATH, and that the GitHub CLI `gh` is installed and authenticated.
+
+vim:tw=78:ts=8:ft=help:norl:

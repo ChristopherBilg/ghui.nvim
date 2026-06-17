@@ -1,0 +1,54 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-17-ghui-nvim.md",
+  "tasks": [
+    {
+      "id": 0,
+      "subject": "Task 0: Project tooling & test harness",
+      "status": "completed",
+      "description": "**Goal:** Lay down dev tooling and the mini.test bootstrap so later tasks can run TDD.\n\n**Files:** Create .stylua.toml, selene.toml, .luarc.json, .editorconfig, .gitignore, neovim.yml, Makefile, scripts/typecheck.sh, tests/minimal_init.lua\n\n**Verify:** nvim --headless --noplugin -u tests/minimal_init.lua -c \"lua assert(pcall(require,'mini.test'))\" -c \"qa!\" exits 0; stylua --check tests/ clean\n\n```json:metadata\n{\"files\": [\".stylua.toml\",\"selene.toml\",\".luarc.json\",\".editorconfig\",\".gitignore\",\"neovim.yml\",\"Makefile\",\"scripts/typecheck.sh\",\"tests/minimal_init.lua\"], \"verifyCommand\": \"nvim --headless --noplugin -u tests/minimal_init.lua -c \\\"lua assert(pcall(require,'mini.test'))\\\" -c \\\"qa!\\\" && stylua --check tests/\", \"acceptanceCriteria\": [\"mini.test bootstraps and loads\",\"stylua --check tests/ passes\"]}\n```"
+    },
+    {
+      "id": 1,
+      "subject": "Task 1: config.lua — defaults, merge, validation",
+      "status": "completed",
+      "blockedBy": [0],
+      "description": "**Goal:** Configuration module: LuaCATS types, defaults, merge with unknown-key warnings and assert-based validation.\n\n**Files:** Create lua/ghui/config.lua; Test tests/test_config.lua\n\n**Verify:** make test → test_config green; stylua --check lua/ tests/; selene lua/\n\n```json:metadata\n{\"files\": [\"lua/ghui/config.lua\",\"tests/test_config.lua\"], \"verifyCommand\": \"make test && stylua --check lua/ tests/ && selene lua/\", \"acceptanceCriteria\": [\"merge returns defaults\",\"args replaced wholesale\",\"warns unknown keys\",\"asserts bad types\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: terminal.lua — floating-window lifecycle",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** Terminal engine: open/hide/toggle a single reusable floating ghui session, with resize and window-close handling.\n\n**Files:** Create lua/ghui/terminal.lua; Test tests/test_terminal.lua\n\n**Verify:** make test → test_terminal green; stylua --check lua/ tests/; selene lua/\n\n```json:metadata\n{\"files\": [\"lua/ghui/terminal.lua\",\"tests/test_terminal.lua\"], \"verifyCommand\": \"make test && stylua --check lua/ tests/ && selene lua/\", \"acceptanceCriteria\": [\"open/hide/toggle work\",\"missing binary notifies\",\"WinClosed syncs state\",\"on_open fires twice\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 3: init.lua + plugin/ghui.lua — API & command",
+      "status": "completed",
+      "blockedBy": [2],
+      "description": "**Goal:** Expose setup/open/close/toggle and register the :Ghui user command. First task where make all works end-to-end.\n\n**Files:** Create lua/ghui/init.lua, plugin/ghui.lua; Test tests/test_init.lua\n\n**Verify:** make all → lint + typecheck + test all green\n\n```json:metadata\n{\"files\": [\"lua/ghui/init.lua\",\"plugin/ghui.lua\",\"tests/test_init.lua\"], \"verifyCommand\": \"make all\", \"acceptanceCriteria\": [\"setup merges\",\"API exposed\",\"Ghui command registered\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 4: health.lua — :checkhealth ghui",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** Health checks: Neovim version, ghui on PATH (install hints), gh on PATH, gh auth status (warn if unauthenticated).\n\n**Files:** Create lua/ghui/health.lua; Test tests/test_health.lua\n\n**Verify:** make all → all green (incl test_health)\n\n```json:metadata\n{\"files\": [\"lua/ghui/health.lua\",\"tests/test_health.lua\"], \"verifyCommand\": \"make all\", \"acceptanceCriteria\": [\"report has ghui + Neovim\",\"checks ghui/gh/auth\",\"robust to missing gh\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 5: Documentation",
+      "status": "completed",
+      "blockedBy": [3, 4],
+      "description": "**Goal:** README, vimdoc help (with Health section), CONTRIBUTING, release-please CHANGELOG. Reference (don't generate) screenshot.png.\n\n**Files:** Create README.md, doc/ghui.txt, CONTRIBUTING.md, CHANGELOG.md\n\n**Verify:** make doc exits 0 and creates doc/tags; make all green\n\n```json:metadata\n{\"files\": [\"README.md\",\"doc/ghui.txt\",\"CONTRIBUTING.md\",\"CHANGELOG.md\"], \"verifyCommand\": \"make doc && make all\", \"acceptanceCriteria\": [\"README complete\",\"make doc generates tags\",\"make all green\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 6: CI, release automation & GitHub templates",
+      "status": "completed",
+      "blockedBy": [0],
+      "description": "**Goal:** GitHub Actions CI (lint/typecheck/test on stable+nightly), release-please, dependabot, issue/PR templates.\n\n**Files:** Create .github/workflows/ci.yml, .github/workflows/release-please.yml, release-please-config.json, .release-please-manifest.json, .github/dependabot.yml, .github/ISSUE_TEMPLATE/bug_report.md, .github/ISSUE_TEMPLATE/feature_request.md, .github/PULL_REQUEST_TEMPLATE.md\n\n**Verify:** JSON valid; make all green\n\n```json:metadata\n{\"files\": [\".github/workflows/ci.yml\",\".github/workflows/release-please.yml\",\"release-please-config.json\",\".release-please-manifest.json\",\".github/dependabot.yml\",\".github/ISSUE_TEMPLATE/bug_report.md\",\".github/ISSUE_TEMPLATE/feature_request.md\",\".github/PULL_REQUEST_TEMPLATE.md\"], \"verifyCommand\": \"python3 -c \\\"import json; json.load(open('release-please-config.json')); json.load(open('.release-please-manifest.json'))\\\" && make all\", \"acceptanceCriteria\": [\"CI matrix configured\",\"release-please ghui.nvim 0.1.0\",\"JSON/YAML valid\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-17T16:00:00Z"
+}
