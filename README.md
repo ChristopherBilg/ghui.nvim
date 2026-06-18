@@ -3,8 +3,8 @@
 [![CI](https://github.com/Christopherbilg/ghui.nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/Christopherbilg/ghui.nvim/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
-Run the [`ghui`](https://github.com/kitlangton/ghui) TUI — a keyboard-driven
-interface for your GitHub pull requests — in a floating window inside Neovim, a
+Run the [`ghui`](https://github.com/kitlangton/ghui) TUI (a keyboard-driven
+interface for your GitHub pull requests) in a floating window inside Neovim, a
 single reusable instance you toggle open and closed. Zero runtime dependencies.
 
 Inspired by [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) and
@@ -17,7 +17,7 @@ Inspired by [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) and
 - Neovim >= 0.11
 - The [`ghui`](https://github.com/kitlangton/ghui) executable in your `PATH`
 - The [GitHub CLI](https://cli.github.com) (`gh`), installed and authenticated
-  with `gh auth login` — ghui uses it to talk to GitHub
+  with `gh auth login`; ghui uses it to talk to GitHub
 
 Run `:checkhealth ghui` to verify.
 
